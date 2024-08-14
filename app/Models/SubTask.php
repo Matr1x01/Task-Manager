@@ -11,8 +11,7 @@ class SubTask extends Model
     use HasFactory;
 
     protected $fillable = [
-        'name',
-        'description',
+        'title',
         'status',
         'task_id',
     ];

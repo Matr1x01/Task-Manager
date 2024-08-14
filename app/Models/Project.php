@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 
@@ -14,6 +15,7 @@ class Project extends Model
     protected $fillable = [
         'name',
         'description',
+        'user_id',
         'status',
     ];
 
@@ -25,5 +27,10 @@ class Project extends Model
     public function subTasks(): HasManyThrough
     {
         return $this->hasManyThrough(SubTask::class, Task::class);
+    }
+
+    public function user(): belongsTo
+    {
+        return $this->belongsTo(User::class);
     }
 }
