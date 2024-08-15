@@ -2,10 +2,12 @@
 
 namespace App\Repositories;
 
+use App\Models\Project;
 use App\Models\SubTask;
 use App\Models\Task;
 use Illuminate\Database\Eloquent\Collection;
-use TaskStatus;
+use App\Enums\TaskStatus;
+use Illuminate\Support\Facades\DB;
 
 class TaskRepository
 {
@@ -19,30 +21,29 @@ class TaskRepository
         return Task::query()->where('project_id', $project_id)->where('id', $task_id)->first();
     }
 
-    public function createTask(string $title, string $description, TaskStatus $taskStatus, string $project_id): Task
+    public function createTask(string $title, string $description, TaskStatus $taskStatus, Project $project): Task
     {
         return Task::query()->create([
             'title' => $title,
             'description' => $description,
-            'project_id' => $project_id,
+            'project_id' => $project->id,
             'status' => 1,
             'task_status' => $taskStatus->value,
         ]);
     }
 
-    public function updateTask(string $title, string $description, TaskStatus $taskStatus, string $project_id, string $task_id): Task
+    public function updateTask(Task $task, string $title, string $description, TaskStatus $taskStatus): bool
     {
-        $task = Task::query()->where('project_id', $project_id)->where('id', $task_id)->first();
-        $task->title = $title;
-        $task->description = $description;
-        $task->task_status = $taskStatus->value;
-        $task->save();
-        return $task;
+        return $task->update([
+            'title' => $title,
+            'description' => $description,
+            'task_status' => $taskStatus->value,
+        ]);
     }
 
-    public function deleteTask(string $project_id, string $task_id): void
+    public function deleteTask(Task $task): bool
     {
-        Task::query()->where('project_id', $project_id)->where('id', $task_id)->delete();
+        return $task->delete();
     }
 
     public function updateTaskStatus(TaskStatus $taskStatus, string $project_id, string $task_id): Task
@@ -55,12 +56,12 @@ class TaskRepository
 
     public function getSubTasks(string $project_id, string $task_id): Collection
     {
-        return SubTask::query()->where('project_id', $project_id)->where('task_id', $task_id)->get();
+        return SubTask::query()->where('task_id', $task_id)->get();
     }
 
     public function getSubTaskById(string $project_id, string $task_id, string $sub_task_id): SubTask|null
     {
-        return SubTask::query()->where('project_id', $project_id)->where('task_id', $task_id)->where('id', $sub_task_id)->first();
+        return SubTask::query()->where('task_id', $task_id)->where('id', $sub_task_id)->first();
     }
 
     public function createSubTask(string $title, string $project_id, string $task_id): SubTask
@@ -73,16 +74,42 @@ class TaskRepository
         ]);
     }
 
-    public function updateSubTask(string $title, string $project_id, string $task_id, string $sub_task_id): SubTask
+    public function updateSubTask(SubTask $subTask, string $title): bool
     {
-        $subTask = SubTask::query()->where('project_id', $project_id)->where('task_id', $task_id)->where('id', $sub_task_id)->first();
-        $subTask->title = $title;
-        $subTask->save();
-        return $subTask;
+        return $subTask->update([
+            'title' => $title,
+        ]);
     }
 
-    public function deleteSubTask(string $project_id, string $task_id, string $sub_task_id): void
+    public function deleteSubTask(SubTask $subTask): bool
     {
-        SubTask::query()->where('project_id', $project_id)->where('task_id', $task_id)->where('id', $sub_task_id)->delete();
+        return $subTask->delete();
+    }
+
+    public function createTasksFromCsv(array $tasks, string $project_id)
+    {
+        $tasks = array_map(function ($task) use ($project_id) {
+            return [
+                'title' => $task['title'],
+                'description' => $task['description'],
+                'task_status' => $task['task_status'],
+                'project_id' => $project_id,
+                'status' => 1,
+                'id' => 0
+            ];
+        }, $tasks);
+
+        try {
+            DB::transaction(function () use ($tasks) {
+                Task::query()->upsert(
+                    $tasks,
+                    ['id'],
+                    ['title', 'description', 'task_status', 'project_id', 'status']
+                );
+            });
+            return false;
+        } catch (\Exception $e) {
+            return $e->getMessage();
+        }
     }
 }

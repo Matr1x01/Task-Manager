@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use App\Enums\TaskStatus;
 
 class TaskCreateRequest extends FormRequest
 {
@@ -11,7 +12,7 @@ class TaskCreateRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -24,6 +25,7 @@ class TaskCreateRequest extends FormRequest
         return [
             'title' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
+            'task_status' => ['nullable', 'string', 'in:'.collect(array_column(TaskStatus::cases(),'value'))->implode(',')],
         ];
     }
 }

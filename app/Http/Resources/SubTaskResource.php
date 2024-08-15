@@ -14,6 +14,11 @@ class SubTaskResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        return parent::toArray($request);
+        return [
+            'id' => $this->id,
+            'title' => $this->title,
+            'created_at' => date('Y-m-d H:i:s', strtotime($this->created_at)),
+            'updated_at' => date('Y-m-d H:i:s', strtotime($this->updated_at)),
+        ];
     }
 }

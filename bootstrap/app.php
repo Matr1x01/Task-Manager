@@ -12,7 +12,8 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        //
+        $middleware->alias(['rate_limit'=> App\Http\Middleware\RateLimitMiddleware::class]);
+        $middleware->api(['rate_limit']);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //
