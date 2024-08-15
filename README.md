@@ -145,7 +145,20 @@ php artisan serve
 - `GET /api/projects/{project_id}/tasks/{task_id}/subtasks`: Get all subtasks for a task
 - `GET /api/projects/{project_id}/tasks/{task_id}/subtasks/{subtask_id}`: Get a specific subtask
 - `POST /api/projects/{project_id}/tasks/{task_id}/subtasks`: Create a new subtask
+- - Request Body:
+      ```json
+      {
+        "title": "Sub Task Title"
+      }
+      ```
+    
 - `PUT /api/projects/{project_id}/tasks/{task_id}/subtasks/{subtask_id}`: Update a subtask
+- - Request Body:
+      ```json
+      {
+        "title": "Updated Sub Task Title"
+      }
+      ```
 - `DELETE /api/projects/{project_id}/tasks/{task_id}/subtasks/{subtask_id}`: Delete a subtask
 
 ## Rate Limiting
