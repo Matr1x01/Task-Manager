@@ -4,8 +4,8 @@ namespace App\Http\Middleware;
 
 use App\Helpers\JsonResponder;
 use Closure;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Symfony\Component\HttpFoundation\Response;
 
 class RateLimitMiddleware
@@ -16,8 +16,8 @@ class RateLimitMiddleware
     public function handle(Request $request, Closure $next)
     {
         $key = $this->resolveRequestSignature($request);
-        $maxAttempts = $this->maxAttempts;
-        $decayMinutes = $this->decayMinutes;
+        $maxAttempts = config('app.rate_limit', $this->maxAttempts);
+        $decayMinutes = config('app.rate_limiter_duration', $this->decayMinutes);
 
         if ($this->tooManyAttempts($key, $maxAttempts)) {
             return JsonResponder::respond(
@@ -33,7 +33,7 @@ class RateLimitMiddleware
 
     protected function resolveRequestSignature(Request $request): string
     {
-        return sha1($request->ip().'|'.$request->path());
+        return sha1($request->ip() . '|' . $request->path());
     }
 
     protected function tooManyAttempts(string $key, int $maxAttempts): bool
@@ -43,7 +43,7 @@ class RateLimitMiddleware
 
     protected function hit(string $key, int $decayMinutes): void
     {
-        $hits = (int) Cache::get($key, 0);
+        $hits = (int)Cache::get($key, 0);
         Cache::put($key, $hits + 1, now()->addMinutes($decayMinutes));
     }
 }

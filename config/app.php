@@ -67,6 +67,9 @@ return [
 
     'timezone' => env('APP_TIMEZONE', 'UTC'),
 
+    'rate_limit' => env('RATE_LIMITER_LIMIT', 60),
+    'rate_limiter_duration' => env('RATE_LIMITER_DURATION', 1),
+
     /*
     |--------------------------------------------------------------------------
     | Application Locale Configuration

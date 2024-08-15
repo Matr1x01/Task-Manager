@@ -1,66 +1,154 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Installation and Setup Guide
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+This guide will walk you through the process of setting up the Project Management API on your local machine.
 
-## About Laravel
+## Prerequisites
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+Before you begin, ensure you have the following installed on your system:
+- PHP (>= 8)
+- Composer
+- MySQL
+- Git
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Clone the Repository
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+```bash
+git clone https://github.com/Matr1x01/Task-Manager.git
+cd Task-Manager
+```
 
-## Learning Laravel
+# Install dependencies
+```bash
+composer install
+```
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+# Set up environment file
+```bash
+cp .env.example .env
+```
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+# Database setup
+Create a new mysql database named `task_manager` and update the .env file with the database details.
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+```bash
+php artisan migrate
+```
+# Generate application key
+```bash
+php artisan key:generate
+```
 
-## Laravel Sponsors
+# Run migrations
+```bash
+php artisan migrate
+```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+# Install and configure Passport
+Run the following command to install Passport client:
+```bash
+php artisan passport:client --personal
+```
+and update the `PASSPORT_PERSONAL_ACCESS_CLIENT_ID` and `PASSPORT_PERSONAL_ACCESS_CLIENT_SECRET` in the `.env` file.
 
-### Premium Partners
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+# Start the development server
+```bash
+php artisan serve
+```
 
-## Contributing
+## Features
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+- User authentication (login and registration)
+- Project management (CRUD operations)
+- Task management (CRUD operations)
+- Subtask management (CRUD operations)
+- Project reports
+- Task upload functionality
 
-## Code of Conduct
+# API Endpoints
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+## Authentication
 
-## Security Vulnerabilities
+- `POST /api/register`: Create a new user
+    - Request Body:
+      ```json
+      {
+        "name": "John Doe",
+        "email": "john.doe@example.com",
+        "password": "your_password"
+      }
+      ```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+- `POST /api/login`: Authenticate user and generate token
+    - Request Body:
+      ```json
+      {
+        "email": "john.doe@example.com",
+        "password": "your_password"
+      }
+      ```
 
-## License
+- `POST /api/logout`: User logout
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## Projects
+
+- `GET /api/projects`: Get all projects for authenticated user
+- `GET /api/projects/{project_id}`: Get details of a specific project
+- `POST /api/projects`: Create a new project
+    - Request Body:
+      ```json
+      {
+        "name": "My Project",
+        "description": "A sample project description"
+      }
+      ```
+- `PUT /api/projects/{project_id}`: Update an existing project
+    - Request Body:
+      ```json
+      {
+        "name": "Updated Project Name",
+        "description": "Updated project description"
+      }
+      ```
+- `DELETE /api/projects/{project_id}`: Delete a project
+- `GET /api/projects/{project_id}/report`: Get project report
+
+## Tasks
+
+- `GET /api/projects/{project_id}/tasks`: Get all tasks for a project
+- `GET /api/projects/{project_id}/tasks/{task_id}`: Get details of a specific task
+- `POST /api/projects/{project_id}/tasks`: Create a new task
+    - Request Body:
+      ```json
+      {
+        "title": "Task Title",
+        "description": "Task description",
+        "task_status": "pending"  // Options: pending, in_progress, completed, cancelled
+      }
+      ```
+- `PUT /api/projects/{project_id}/tasks/{task_id}`: Update a task
+    - Request Body:
+      ```json
+      {
+        "title": "Updated Task Title",
+        "description": "Updated task description",
+        "task_status": "pending"  // Options: pending, in_progress, completed, cancelled
+      }
+      ```
+- `DELETE /api/projects/{project_id}/tasks/{task_id}`: Delete a task
+- `POST /api/projects/{project_id}/tasks/upload`: Upload tasks from a CSV file
+    - The CSV file headers should contain `title`, `description`, `task_status`
+    - A demo CSV file `csv_upload_test.csv` is available in the project for testing
+
+## Subtasks
+
+- `GET /api/projects/{project_id}/tasks/{task_id}/subtasks`: Get all subtasks for a task
+- `GET /api/projects/{project_id}/tasks/{task_id}/subtasks/{subtask_id}`: Get a specific subtask
+- `POST /api/projects/{project_id}/tasks/{task_id}/subtasks`: Create a new subtask
+- `PUT /api/projects/{project_id}/tasks/{task_id}/subtasks/{subtask_id}`: Update a subtask
+- `DELETE /api/projects/{project_id}/tasks/{task_id}/subtasks/{subtask_id}`: Delete a subtask
+
+## Rate Limiting
+
+The API implements rate limiting through the `RateLimitMiddleware`.
+Set the rate limit in the `.env` file using the `RATE_LIMITER_LIMIT` variable.
